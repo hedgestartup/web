@@ -13,7 +13,7 @@ function svgMesh3d (svgPath, opt) {
   if (typeof svgPath !== 'string') {
     throw new TypeError('must provide a string as first parameter')
   }
-  
+
   opt = assign({
     delaunay: true,
     clean: true,
@@ -22,21 +22,21 @@ function svgMesh3d (svgPath, opt) {
     simplify: 0,
     scale: 1
   }, opt)
-  
+
   var i
   // parse string as a list of operations
   var svg = parseSVG(svgPath)
-  
+
   // convert curves into discrete points
   var contours = getContours(svg, opt.scale)
-  
+
   // optionally simplify the path for faster triangulation and/or aesthetics
   if (opt.simplify > 0 && typeof opt.simplify === 'number') {
     for (i = 0; i < contours.length; i++) {
       contours[i] = simplify(contours[i], opt.simplify)
     }
   }
-  
+
   // prepare for triangulation
   var polyline = denestPolyline(contours)
   var positions = polyline.positions
@@ -47,7 +47,7 @@ function svgMesh3d (svgPath, opt) {
   if (typeof randomization === 'number' && randomization > 0) {
     addRandomPoints(positions, bounds, randomization)
   }
-  
+
   var loops = polyline.edges
   var edges = []
   for (i = 0; i < loops.length; ++i) {
@@ -57,7 +57,7 @@ function svgMesh3d (svgPath, opt) {
     }
   }
 
-  // this updates points/edges so that they now form a valid PSLG 
+  // this updates points/edges so that they now form a valid PSLG
   if (opt.clean !== false) {
     cleanPSLG(positions, edges)
   }
