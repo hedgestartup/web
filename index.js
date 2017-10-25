@@ -1,74 +1,124 @@
+var parseSVG = require('parse-svg-path')
+var getContours = require('svg-path-contours')
+var cdt2d = require('cdt2d')
+var cleanPSLG = require('clean-pslg')
+var getBounds = require('bound-points')
+var normalize = require('normalize-path-scale')
+var random = require('random-float')
+var assign = require('object-assign')
+var simplify = require('simplify-path')
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <title>svg-mesh-3d</title>
-  <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css'>
-  <style type="text/css">
-  body {
-    font-family: 'Noto Sans', Helvetica, sans-serif;
-    font-size: 16px;
-    background: #97c2c5;
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-    color: #4C4C4C;
+module.exports = svgMesh3d
+function svgMesh3d (svgPath, opt) {
+  if (typeof svgPath !== 'string') {
+    throw new TypeError('must provide a string as first parameter')
   }
-  canvas {
-    display: block;
-    position: fixed;
-    z-index: -5;
+  
+  opt = assign({
+    delaunay: true,
+    clean: true,
+    exterior: false,
+    randomization: 0,
+    simplify: 0,
+    scale: 1
+  }, opt)
+  
+  var i
+  // parse string as a list of operations
+  var svg = parseSVG(svgPath)
+  
+  // convert curves into discrete points
+  var contours = getContours(svg, opt.scale)
+  
+  // optionally simplify the path for faster triangulation and/or aesthetics
+  if (opt.simplify > 0 && typeof opt.simplify === 'number') {
+    for (i = 0; i < contours.length; i++) {
+      contours[i] = simplify(contours[i], opt.simplify)
+    }
   }
-  div {
-    margin: 10px;
-    font-weight: 700;
-    font-size: 13px;
-  }
-  p {
-    z-index: 10;
-    font-weight: 300;
-    margin: 5px 0px;
-  }
-  .link, .link:active, .info:visited {
-    text-decoration: none;
-    font-weight: 700;
-    color: #424242;
-    position: relative;
-  }
-  .link:hover {
-  }
-  .link::after, .link:hover::after {
-    content: ' ';
-    width: 100%;
-    left: 0;
-    background: currentColor;
-    z-index: 10;
-    position: absolute;
-    -webkit-transition: all 0.05s ease-out;
-    -moz-transition: all 0.05s ease-out;
-    -ms-transition: all 0.05s ease-out;
-    -o-transition: all 0.05s ease-out;
-    transition: all 0.05s ease-out;
-  }
-  .link::after {
-    height: 0px;
-    bottom: 0px;
-  }
-  .link:hover::after {
-    height: 4px;
-    bottom: -4px;
-  }
-  </style>
-</head>
-<body>
-  <canvas></canvas>
+  
+  // prepare for triangulation
+  var polyline = denestPolyline(contours)
+  var positions = polyline.positions
+  var bounds = getBounds(positions)
 
-  <script src="bundle.js" async></script>
-</body>
-<footer>
-  <div>
-    <a class="link main" href="main.html">BITSG is BLUE ISLAND TOKEN SECTOR G</a>
-  </div>
-</footer>
-</html>
+  // optionally add random points for aesthetics
+  var randomization = opt.randomization
+  if (typeof randomization === 'number' && randomization > 0) {
+    addRandomPoints(positions, bounds, randomization)
+  }
+  
+  var loops = polyline.edges
+  var edges = []
+  for (i = 0; i < loops.length; ++i) {
+    var loop = loops[i]
+    for (var j = 0; j < loop.length; ++j) {
+      edges.push([loop[j], loop[(j + 1) % loop.length]])
+    }
+  }
+
+  // this updates points/edges so that they now form a valid PSLG 
+  if (opt.clean !== false) {
+    cleanPSLG(positions, edges)
+  }
+
+  // triangulate mesh
+  var cells = cdt2d(positions, edges, opt)
+
+  // rescale to [-1 ... 1]
+  if (opt.normalize !== false) {
+    normalize(positions, bounds)
+  }
+
+  // convert to 3D representation and flip on Y axis for convenience w/ OpenGL
+  to3D(positions)
+
+  return {
+    positions: positions,
+    cells: cells
+  }
+}
+
+function to3D (positions) {
+  for (var i = 0; i < positions.length; i++) {
+    var xy = positions[i]
+    xy[1] *= -1
+    xy[2] = xy[2] || 0
+  }
+}
+
+function addRandomPoints (positions, bounds, count) {
+  var min = bounds[0]
+  var max = bounds[1]
+
+  for (var i = 0; i < count; i++) {
+    positions.push([ // random [ x, y ]
+      random(min[0], max[0]),
+      random(min[1], max[1])
+    ])
+  }
+}
+
+function denestPolyline (nested) {
+  var positions = []
+  var edges = []
+
+  for (var i = 0; i < nested.length; i++) {
+    var path = nested[i]
+    var loop = []
+    for (var j = 0; j < path.length; j++) {
+      var pos = path[j]
+      var idx = positions.indexOf(pos)
+      if (idx === -1) {
+        positions.push(pos)
+        idx = positions.length - 1
+      }
+      loop.push(idx)
+    }
+    edges.push(loop)
+  }
+  return {
+    positions: positions,
+    edges: edges
+  }
+}
