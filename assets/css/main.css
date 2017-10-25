@@ -3914,3 +3914,8 @@
 			}
 
 		}
+		canvas {
+		    display: block;
+		    position: fixed;
+		    z-index: -5;
+		  }
