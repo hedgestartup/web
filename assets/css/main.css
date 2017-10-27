@@ -4045,13 +4045,10 @@
 	position: absolute;
 	display: block;
 	content: '';
-	width: 100%;
+	min-width: 670px; }
 	height: 5px;
 	top: -25px;
 	left: 0;
-	position: relative;
-	width: 210px;
-	padding: 25px 0;
 	background: url(../../images/stripe.png) repeat-x 0 0;
 }
 
