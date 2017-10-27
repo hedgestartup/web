@@ -4045,7 +4045,7 @@
 	position: absolute;
 	display: block;
 	content: '';
-	min-width: 670px; }
+	width: 150%;
 	height: 5px;
 	top: -25px;
 	left: 0;
