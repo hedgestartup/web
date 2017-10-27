@@ -1922,13 +1922,13 @@
 		.pricing-table thead .plan .green {
 		color: #36611e;
 		text-shadow: 1px 1px 0px rgba(255,255,255, .2);
-		background: url(../images/green_pattern.png) repeat-x 0 0;
+		background: url(../../images/green_pattern.png) repeat-x 0 0;
 		}
 
 		.pricing-table thead .plan .orange {
 		color: #fafafa;
 		text-shadow: 1px 1px 2px rgba(0,0,0, .4);
-		background: url(../images/orange_pattern.png) repeat-x 0 0;		
+		background: url(../../images/orange_pattern.png) repeat-x 0 0;		
 		}
 /* Plan Price Section */
 		.pricing-table thead .price td {
@@ -2044,7 +2044,7 @@
 		height: 5px;
 		top: -25px;
 		left: 0;
-		background: url(../images/stripe.png) repeat-x 0 0;
+		background: url(../../images/stripe.png) repeat-x 0 0;
 		}
 
 		.pricing-table tbody td {
@@ -2094,11 +2094,11 @@
 
 @font-face {
     font-family: 'Lobster13Regular';
-    src: url('images/Lobster_1.3-webfont.eot');
-    src: url('images/Lobster_1.3-webfont.eot?#iefix') format('embedded-opentype'),
-         url('images/Lobster_1.3-webfont.woff') format('woff'),
-         url('images/Lobster_1.3-webfont.ttf') format('truetype'),
-         url('images/Lobster_1.3-webfont.svg#Lobster13Regular') format('svg');
+    src: url('../../images/Lobster_1.3-webfont.eot');
+    src: url('../../images/Lobster_1.3-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../../images/Lobster_1.3-webfont.woff') format('woff'),
+         url('../../images/Lobster_1.3-webfont.ttf') format('truetype'),
+         url('../../images/Lobster_1.3-webfont.svg#Lobster13Regular') format('svg');
     font-weight: normal;
     font-style: normal;
 }
