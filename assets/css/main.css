@@ -4045,7 +4045,7 @@
 	position: absolute;
 	display: block;
 	content: '';
-	width: 150%;
+	width: 115%;
 	height: 5px;
 	top: -25px;
 	left: 0;
@@ -4053,7 +4053,7 @@
 }
 
 .pricing-table tbody td {
-	width: 250px;
+	width: 170px;
 	padding-left: 40px;
 	line-height: 30px;
 	border-top: 1px solid #f2f2f2;
