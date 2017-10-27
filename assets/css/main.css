@@ -3963,7 +3963,7 @@
 .pricing-table thead .price p span {
 	font-size: 0.5em;
 	display: table-cell;
-	vertical-align: middle;
+	vertical-align: left;
 }
 
 .pricing-table thead .price span { font-size: 14px; }
